@@ -1,0 +1,41 @@
+// Lean schema: one Profile row, a flat Quest table, and a Log.
+// Single-user by design: this is a personal accountability tool, no auth.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../generated/prisma"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Profile {
+  id            Int     @id @default(autoincrement())
+  xp            Int     @default(0)
+  streak        Int     @default(0)
+  bestStreak    Int     @default(0)
+  totalDays     Int     @default(0)
+  lastClaim     String? // local date YYYY-MM-DD of last claimed day
+  lastWeekClaim String? // week key YYYY-Www of last sealed week
+  dailyDate     String? // the day the DAILY quests currently belong to
+  weeklyKey     String? // the week the WEEKLY quests currently belong to
+}
+
+model Quest {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String  @default("")
+  type        String  // "DAILY" | "WEEKLY"
+  xp          Int     @default(10)
+  done        Boolean @default(false)
+  order       Int     @default(0)
+}
+
+model LogEntry {
+  id        Int      @id @default(autoincrement())
+  date      String   // "YYYY-MM-DD"
+  text      String
+  createdAt DateTime @default(now())
+}

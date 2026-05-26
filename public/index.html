@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Routine Quest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=VT323&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#14110d; --panel:#1d1813; --panel-2:#241e17; --line:#3a2f22;
+    --ink:#e9ddc7; --ink-dim:#a8987c; --ink-faint:#6f6450;
+    --gold:#d9a441; --ember:#c8702f; --green:#7fae5a; --red:#c0533f;
+    --glow:rgba(217,164,65,0.16);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{
+    font-family:'Spectral',Georgia,serif; color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 50% -10%, rgba(217,164,65,0.08), transparent 60%),
+      radial-gradient(900px 500px at 90% 110%, rgba(200,112,47,0.06), transparent 60%),
+      var(--bg);
+    padding:22px 16px 60px;
+  }
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");}
+  .wrap{max-width:720px;margin:0 auto;position:relative;z-index:1;}
+
+  .crest{text-align:center;margin-bottom:6px;}
+  .crest .eyebrow{font-family:'VT323',monospace;font-size:18px;letter-spacing:4px;color:var(--ember);text-transform:uppercase;}
+  .crest h1{font-family:'Cinzel',serif;font-weight:700;font-size:clamp(26px,6vw,40px);margin:2px 0 4px;letter-spacing:1px;color:var(--gold);text-shadow:0 0 22px var(--glow);}
+  .crest .sub{color:var(--ink-dim);font-style:italic;font-size:14px;}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0 14px;}
+  .stat{background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-radius:8px;padding:10px 8px;text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,0.03);}
+  .stat .num{font-family:'VT323',monospace;font-size:34px;line-height:0.9;color:var(--gold);}
+  .stat.flame .num{color:var(--ember);}
+  .stat .lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);margin-top:4px;}
+
+  .xpwrap{margin:4px 0 20px;}
+  .xprow{display:flex;justify-content:space-between;align-items:baseline;font-family:'VT323',monospace;font-size:16px;color:var(--ink-dim);margin-bottom:4px;}
+  .xprow .lvl{color:var(--gold);letter-spacing:2px;}
+  .xpbar{height:12px;background:var(--panel);border:1px solid var(--line);border-radius:20px;overflow:hidden;}
+  .xpfill{height:100%;width:0%;background:linear-gradient(90deg,var(--ember),var(--gold));box-shadow:0 0 12px var(--glow);transition:width 0.6s cubic-bezier(.2,.8,.2,1);}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-bottom:16px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.35);}
+  .phead{display:flex;align-items:center;gap:10px;padding:13px 16px;cursor:pointer;user-select:none;background:linear-gradient(180deg,var(--panel-2),transparent);border-bottom:1px solid transparent;}
+  .panel.open .phead{border-bottom-color:var(--line);}
+  .phead .tag{font-family:'VT323',monospace;font-size:14px;letter-spacing:2px;color:var(--ember);text-transform:uppercase;}
+  .phead h2{font-family:'Cinzel',serif;font-weight:600;font-size:18px;margin:0;color:var(--ink);flex:1;letter-spacing:0.5px;}
+  .phead .meta{font-family:'VT323',monospace;font-size:18px;color:var(--ink-dim);}
+  .phead .chev{color:var(--ink-faint);transition:transform 0.25s;font-size:13px;}
+  .panel.open .phead .chev{transform:rotate(90deg);}
+  .pbody{display:none;padding:6px 16px 16px;}
+  .panel.open .pbody{display:block;}
+  .pintro{color:var(--ink-dim);font-size:14px;font-style:italic;margin:8px 2px 14px;line-height:1.5;}
+
+  .quest{display:flex;gap:12px;align-items:flex-start;padding:11px 12px;border:1px solid transparent;border-radius:8px;cursor:pointer;transition:background .15s,border-color .15s;}
+  .quest:hover{background:var(--panel-2);border-color:var(--line);}
+  .quest+.quest{margin-top:2px;}
+  .box{flex:0 0 22px;height:22px;margin-top:1px;border:1.5px solid var(--ink-faint);border-radius:5px;display:grid;place-items:center;transition:all .18s;font-family:'VT323',monospace;color:transparent;font-size:18px;}
+  .quest.done .box{background:var(--green);border-color:var(--green);color:#14110d;}
+  .quest.done .box::after{content:"✓";}
+  .qtext{flex:1;}
+  .qtext .qt{font-size:15px;line-height:1.35;}
+  .quest.done .qtext .qt{color:var(--ink-faint);text-decoration:line-through;text-decoration-color:var(--ink-faint);}
+  .qtext .qd{font-size:12.5px;color:var(--ink-faint);margin-top:2px;line-height:1.4;}
+  .quest .xp{flex:0 0 auto;font-family:'VT323',monospace;font-size:15px;color:var(--ink-faint);margin-top:2px;}
+  .quest.done .xp{color:var(--green);}
+
+  .claim{width:100%;margin-top:14px;padding:14px;font-family:'Cinzel',serif;font-weight:700;font-size:16px;letter-spacing:2px;text-transform:uppercase;color:#14110d;border:none;border-radius:8px;background:linear-gradient(180deg,var(--gold),var(--ember));cursor:pointer;box-shadow:0 6px 20px var(--glow);transition:transform .1s,filter .2s;}
+  .claim:hover:not(:disabled){filter:brightness(1.08);}
+  .claim:active:not(:disabled){transform:translateY(2px);}
+  .claim:disabled{background:var(--panel-2);color:var(--ink-faint);box-shadow:none;cursor:not-allowed;border:1px solid var(--line);}
+  .claimed-note{text-align:center;color:var(--green);font-family:'VT323',monospace;font-size:18px;margin-top:12px;letter-spacing:1px;}
+
+  textarea.json{width:100%;min-height:120px;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--ink);font-family:'VT323',monospace;font-size:15px;line-height:1.4;resize:vertical;}
+  textarea.json:focus{outline:none;border-color:var(--gold);}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px;}
+  .btn{font-family:'Cinzel',serif;font-weight:600;font-size:13px;letter-spacing:1px;padding:9px 16px;border-radius:7px;cursor:pointer;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);}
+  .btn.primary{background:linear-gradient(180deg,var(--gold),var(--ember));color:#14110d;border:none;}
+  .btn:hover{filter:brightness(1.08);}
+  .filelbl{font-size:13px;color:var(--ink-dim);}
+  .hint{font-size:12.5px;color:var(--ink-faint);font-style:italic;}
+
+  .logline{display:flex;gap:10px;padding:8px 4px;border-bottom:1px solid var(--line);font-size:13.5px;}
+  .logline:last-child{border-bottom:none;}
+  .logline .ld{font-family:'VT323',monospace;color:var(--ember);flex:0 0 auto;font-size:15px;}
+  .logline .lt{color:var(--ink-dim);}
+  .logempty{color:var(--ink-faint);font-style:italic;font-size:13px;padding:6px 4px;}
+
+  .foot{text-align:center;margin-top:24px;}
+  .reset{background:none;border:1px solid var(--line);color:var(--ink-faint);font-family:'VT323',monospace;font-size:14px;letter-spacing:1px;padding:7px 16px;border-radius:6px;cursor:pointer;}
+  .reset:hover{color:var(--red);border-color:var(--red);}
+
+  #toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:var(--panel-2);border:1px solid var(--gold);color:var(--gold);font-family:'Cinzel',serif;letter-spacing:1px;padding:12px 22px;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.5),0 0 20px var(--glow);opacity:0;pointer-events:none;transition:all .35s cubic-bezier(.2,.8,.2,1);z-index:50;font-size:14px;}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  #toast.err{border-color:var(--red);color:var(--red);}
+  .loading{text-align:center;padding:80px 0;color:var(--ink-dim);font-family:'VT323',monospace;font-size:20px;letter-spacing:2px;}
+</style>
+</head>
+<body>
+<div class="wrap" id="root"><div class="loading">SUMMONING QUEST LOG…</div></div>
+<div id="toast"></div>
+
+<script>
+const api = (p, opts) => fetch(p, opts).then(async r => {
+  const j = await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.error || "Request failed");
+  return j;
+});
+let S = null;            // last state
+const open = { import:true, daily:true, weekly:true, log:false };
+
+function toast(msg, isErr){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.toggle('err',!!isErr); t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),1900);
+}
+
+async function refresh(){ S = await api('/api/state'); render(); }
+
+function questRow(q){
+  return `<div class="quest ${q.done?'done':''}" data-q="${q.id}">
+    <div class="box"></div>
+    <div class="qtext"><div class="qt">${esc(q.title)}</div>${q.description?`<div class="qd">${esc(q.description)}</div>`:''}</div>
+    <div class="xp">+${q.xp}</div>
+  </div>`;
+}
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function panel(key,tag,title,meta,intro,body){
+  const o=open[key];
+  return `<div class="panel ${o?'open':''}" data-panel="${key}">
+    <div class="phead" data-head="${key}"><span class="tag">${tag}</span><h2>${title}</h2>
+      <span class="meta">${meta||''}</span><span class="chev">▶</span></div>
+    <div class="pbody">${intro?`<div class="pintro">${intro}</div>`:''}${body}</div></div>`;
+}
+
+function render(){
+  const p=S.profile, f=S.flags;
+  document.getElementById('root').innerHTML = `
+    <div class="crest">
+      <div class="eyebrow">▸ Routine Quest ◂</div>
+      <h1>Daily &amp; Weekly Quests</h1>
+      <div class="sub">Upload a quest set. Check things off. Watch the bar fill.</div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="num">${p.level}</div><div class="lbl">Level</div></div>
+      <div class="stat flame"><div class="num">${p.streak}🔥</div><div class="lbl">Streak</div></div>
+      <div class="stat"><div class="num">${p.totalDays}</div><div class="lbl">Days</div></div>
+      <div class="stat"><div class="num">${p.bestStreak}</div><div class="lbl">Best</div></div>
+    </div>
+    <div class="xpwrap">
+      <div class="xprow"><span class="lvl">LVL ${p.level}</span><span>${p.xpInLevel} / 100 XP</span></div>
+      <div class="xpbar"><div class="xpfill" style="width:${p.xpInLevel}%"></div></div>
+    </div>
+    ${importPanel()}
+    ${f.hasDaily ? dailyPanel() : ''}
+    ${f.hasWeekly ? weeklyPanel() : ''}
+    ${logPanel()}
+    <div class="foot"><button class="reset" id="resetBtn">↺ Reset everything</button></div>`;
+  bind();
+}
+
+function importPanel(){
+  const body = `
+    <textarea class="json" id="jsonBox" placeholder='{ "daily": [ { "title": "...", "description": "...", "xp": 10 } ], "weekly": [ { "title": "...", "xp": 30 } ] }'></textarea>
+    <div class="row">
+      <button class="btn primary" id="importBtn">⬆ Import quests</button>
+      <label class="btn" style="cursor:pointer">📂 Choose file<input id="fileIn" type="file" accept=".json,application/json" hidden></label>
+      <span class="filelbl" id="fileName"></span>
+    </div>
+    <div class="hint" style="margin-top:8px;">Importing replaces the current quest set. Your XP, streak and log are kept.</div>`;
+  return panel('import','◈ Scroll','Quest Set','', 'Paste or upload a JSON with <b>daily</b> and/or <b>weekly</b> arrays. Each quest needs a <b>title</b>; description and xp are optional.', body);
+}
+
+function dailyPanel(){
+  const done=S.daily.filter(q=>q.done).length;
+  let action;
+  if(S.profile.claimedToday) action=`<div class="claimed-note">✓ DAY CLAIMED — streak ${S.profile.streak}🔥. Back tomorrow.</div>`;
+  else action=`<button class="claim" id="claimDay" ${S.flags.allDailyDone?'':'disabled'}>${S.flags.allDailyDone?"⚔ Claim the Day":`Finish all ${S.daily.length} to claim`}</button>`;
+  return panel('daily','◈ The Grind','Today',`${done}/${S.daily.length}`,'', S.daily.map(questRow).join('')+action);
+}
+
+function weeklyPanel(){
+  const done=S.weekly.filter(q=>q.done).length;
+  let action;
+  if(S.profile.sealedThisWeek) action=`<div class="claimed-note">★ WEEK SEALED.</div>`;
+  else action=`<button class="claim" id="claimWeek" ${S.flags.allWeeklyDone?'':'disabled'}>${S.flags.allWeeklyDone?"★ Seal the Week":`Finish all ${S.weekly.length} to seal`}</button>`;
+  return panel('weekly','◈ The Long Game','This Week',`${done}/${S.weekly.length}`,'', S.weekly.map(questRow).join('')+action);
+}
+
+function logPanel(){
+  const items=S.log.map(l=>`<div class="logline"><span class="ld">${esc(l.date.slice(5))}</span><span class="lt">${esc(l.text)}</span></div>`).join('');
+  return panel('log','◈ Chronicle','The Log','', '', items||`<div class="logempty">Nothing recorded yet.</div>`);
+}
+
+function bind(){
+  document.querySelectorAll('[data-head]').forEach(h=>h.addEventListener('click',()=>{open[h.dataset.head]=!open[h.dataset.head];render();}));
+  document.querySelectorAll('.quest').forEach(q=>q.addEventListener('click',()=>toggle(q.dataset.q)));
+  const ib=document.getElementById('importBtn'); if(ib) ib.addEventListener('click',doImport);
+  const fi=document.getElementById('fileIn'); if(fi) fi.addEventListener('change',readFile);
+  const cd=document.getElementById('claimDay'); if(cd) cd.addEventListener('click',()=>act('/api/claim-day','⚔ Day claimed'));
+  const cw=document.getElementById('claimWeek'); if(cw) cw.addEventListener('click',()=>act('/api/claim-week','★ Week sealed'));
+  const rb=document.getElementById('resetBtn'); if(rb) rb.addEventListener('click',doReset);
+}
+
+async function toggle(id){
+  try{ S=await api(`/api/quest/${id}/toggle`,{method:'POST'}); render(); }
+  catch(e){ toast(e.message,true); }
+}
+async function act(url,msg){
+  try{ S=await api(url,{method:'POST'}); toast(msg); render(); }
+  catch(e){ toast(e.message,true); }
+}
+function readFile(e){
+  const file=e.target.files[0]; if(!file) return;
+  document.getElementById('fileName').textContent=file.name;
+  const r=new FileReader();
+  r.onload=()=>{ const box=document.getElementById('jsonBox'); if(box) box.value=r.result; };
+  r.readAsText(file);
+}
+async function doImport(){
+  const box=document.getElementById('jsonBox');
+  let parsed;
+  try{ parsed=JSON.parse(box.value); }
+  catch{ return toast('That is not valid JSON',true); }
+  try{ S=await api('/api/import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(parsed)}); toast('Quests imported'); open.import=false; render(); }
+  catch(e){ toast(e.message,true); }
+}
+async function doReset(){
+  if(!confirm('Wipe quests, XP, streak and log?')) return;
+  try{ S=await api('/api/reset',{method:'POST'}); toast('Reset'); render(); }
+  catch(e){ toast(e.message,true); }
+}
+
+refresh().catch(e=>{
+  document.getElementById('root').innerHTML=`<div class="loading">Could not reach the server.<br><span style="font-size:14px">${esc(e.message)}</span></div>`;
+});
+</script>
+</body>
+</html>

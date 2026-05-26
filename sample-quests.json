@@ -1,0 +1,14 @@
+{
+  "daily": [
+    { "title": "Make bed + 10 min tidy", "description": "Win the first 10 minutes of the day.", "xp": 10 },
+    { "title": "Train / move the body", "description": "Gym, run, or a real walk. Counts if you sweat or strain.", "xp": 20 },
+    { "title": "Deep-work block (90 min)", "description": "One uninterrupted block on the thing that matters most.", "xp": 25 },
+    { "title": "Read 10 pages", "description": "Anything that isn't a feed.", "xp": 10 },
+    { "title": "Plan tomorrow (5 min)", "description": "Write the top 3 before you sleep.", "xp": 10 }
+  ],
+  "weekly": [
+    { "title": "Weekly review", "description": "Look back at the log. What worked, what slipped.", "xp": 40 },
+    { "title": "One hard thing", "description": "The task you've been avoiding all week. Do it.", "xp": 50 },
+    { "title": "Rest + recover day", "description": "One deliberate low day. Recovery is part of the routine.", "xp": 20 }
+  ]
+}
