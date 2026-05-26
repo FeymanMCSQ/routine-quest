@@ -13,7 +13,8 @@
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
     "db:verify": "tsx scripts/verify-prisma.ts",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "prisma db seed",
+    "test:rules": "tsx scripts/phase2-rules-check.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
