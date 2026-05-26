@@ -9,5 +9,5 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true
   },
-  "include": ["src/**/*.ts", "scripts/**/*.ts", "prisma/**/*.ts", "lib/**/*.ts"]
+  "include": ["api/**/*.ts", "src/**/*.ts", "scripts/**/*.ts", "prisma/**/*.ts", "lib/**/*.ts"]
 }
