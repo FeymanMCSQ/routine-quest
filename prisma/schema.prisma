@@ -2,9 +2,10 @@
 // Single-user by design: this is a personal accountability tool, no auth.
 
 generator client {
-  provider            = "prisma-client"
-  output              = "../generated/prisma"
-  importFileExtension = "ts"
+  provider               = "prisma-client"
+  output                 = "../generated/prisma"
+  moduleFormat           = "cjs"
+  importFileExtension    = "js"
 }
 
 datasource db {

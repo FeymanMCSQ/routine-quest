@@ -34,6 +34,9 @@ This project was moved onto Prisma Postgres using the current Prisma ORM v7 setu
   - `vercel.json` runs `npm run vercel-build`
   - `npm run vercel-build` runs `prisma migrate deploy` and `prisma generate`
   - `/healthz` checks that the app can reach the database
+- Forced the generated Prisma Client to CommonJS-compatible output for Vercel:
+  - `moduleFormat = "cjs"`
+  - `importFileExtension = "js"`
 
 ## Why It Mattered
 
@@ -46,6 +49,8 @@ Putting `DATABASE_URL` in `.env` and keeping `.env` ignored prevents database cr
 The migration gives the database a reproducible schema history. The seed script gives a fresh database usable starter data. The verify script gives a quick health check that confirms the generated client, adapter, environment loading, and database connection all work together.
 
 For Vercel, deploys should use `prisma migrate deploy`, not `prisma db push`. `migrate deploy` applies only committed migration files and is the production-safe path for a hosted database.
+
+The CommonJS-compatible Prisma Client output matters because Vercel's Node serverless runtime was loading the generated client through a CommonJS wrapper. The previous generated client contained `import.meta`, which only works inside an ES module and caused the deployed function to crash before the app could answer any request.
 
 ## Useful Commands
 

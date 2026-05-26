@@ -2,7 +2,16 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run vercel-build",
   "devCommand": "npm run dev",
+  "functions": {
+    "api/index.ts": {
+      "includeFiles": "generated/prisma/**"
+    }
+  },
   "rewrites": [
+    {
+      "source": "/",
+      "destination": "/index.html"
+    },
     {
       "source": "/api/(.*)",
       "destination": "/api/index"

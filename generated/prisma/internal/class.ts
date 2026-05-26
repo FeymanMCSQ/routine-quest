@@ -12,7 +12,7 @@
  */
 
 import * as runtime from "@prisma/client/runtime/client"
-import type * as Prisma from "./prismaNamespace.ts"
+import type * as Prisma from "./prismaNamespace.js"
 
 
 const config: runtime.GetPrismaClientConfig = {
@@ -20,7 +20,7 @@ const config: runtime.GetPrismaClientConfig = {
   "clientVersion": "7.8.0",
   "engineVersion": "3c6e192761c0362d496ed980de936e2f3cebcd3a",
   "activeProvider": "postgresql",
-  "inlineSchema": "// Lean schema: one Profile row, a flat Quest table, and a Log.\n// Single-user by design: this is a personal accountability tool, no auth.\n\ngenerator client {\n  provider            = \"prisma-client\"\n  output              = \"../generated/prisma\"\n  importFileExtension = \"ts\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Profile {\n  id            Int     @id @default(autoincrement())\n  xp            Int     @default(0)\n  streak        Int     @default(0)\n  bestStreak    Int     @default(0)\n  totalDays     Int     @default(0)\n  lastClaim     String? // local date YYYY-MM-DD of last claimed day\n  lastWeekClaim String? // week key YYYY-Www of last sealed week\n  dailyDate     String? // the day the DAILY quests currently belong to\n  weeklyKey     String? // the week the WEEKLY quests currently belong to\n}\n\nmodel Quest {\n  id          Int     @id @default(autoincrement())\n  title       String\n  description String  @default(\"\")\n  type        String // \"DAILY\" | \"WEEKLY\"\n  xp          Int     @default(10)\n  done        Boolean @default(false)\n  order       Int     @default(0)\n}\n\nmodel LogEntry {\n  id        Int      @id @default(autoincrement())\n  date      String // \"YYYY-MM-DD\"\n  text      String\n  createdAt DateTime @default(now())\n}\n",
+  "inlineSchema": "// Lean schema: one Profile row, a flat Quest table, and a Log.\n// Single-user by design: this is a personal accountability tool, no auth.\n\ngenerator client {\n  provider            = \"prisma-client\"\n  output              = \"../generated/prisma\"\n  moduleFormat        = \"cjs\"\n  importFileExtension = \"js\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Profile {\n  id            Int     @id @default(autoincrement())\n  xp            Int     @default(0)\n  streak        Int     @default(0)\n  bestStreak    Int     @default(0)\n  totalDays     Int     @default(0)\n  lastClaim     String? // local date YYYY-MM-DD of last claimed day\n  lastWeekClaim String? // week key YYYY-Www of last sealed week\n  dailyDate     String? // the day the DAILY quests currently belong to\n  weeklyKey     String? // the week the WEEKLY quests currently belong to\n}\n\nmodel Quest {\n  id          Int     @id @default(autoincrement())\n  title       String\n  description String  @default(\"\")\n  type        String // \"DAILY\" | \"WEEKLY\"\n  xp          Int     @default(10)\n  done        Boolean @default(false)\n  order       Int     @default(0)\n}\n\nmodel LogEntry {\n  id        Int      @id @default(autoincrement())\n  date      String // \"YYYY-MM-DD\"\n  text      String\n  createdAt DateTime @default(now())\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -45,10 +45,10 @@ async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Modul
 }
 
 config.compilerWasm = {
-  getRuntime: async () => await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.mjs"),
+  getRuntime: async () => await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.js"),
 
   getQueryCompilerWasmModule: async () => {
-    const { wasm } = await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.wasm-base64.mjs")
+    const { wasm } = await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.wasm-base64.js")
     return await decodeBase64AsWasm(wasm)
   },
 

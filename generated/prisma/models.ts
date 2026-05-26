@@ -8,7 +8,7 @@
  *
  * 🟢 You can import this file directly.
  */
-export type * from './models/Profile.ts'
-export type * from './models/Quest.ts'
-export type * from './models/LogEntry.ts'
-export type * from './commonInputTypes.ts'
+export type * from './models/Profile.js'
+export type * from './models/Quest.js'
+export type * from './models/LogEntry.js'
+export type * from './commonInputTypes.js'
