@@ -23,7 +23,13 @@
       radial-gradient(900px 500px at 90% 110%, rgba(200,112,47,0.06), transparent 60%),
       var(--bg);
     padding:22px 16px 60px;
+    overflow-x:hidden;
   }
+  body.busy{cursor:progress;}
+  body.busy button,
+  body.busy textarea,
+  body.busy .quest,
+  body.busy .btn{pointer-events:none;}
   body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");}
   .wrap{max-width:720px;margin:0 auto;position:relative;z-index:1;}
@@ -34,7 +40,9 @@
   .crest .sub{color:var(--ink-dim);font-style:italic;font-size:14px;}
 
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0 14px;}
-  .stat{background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-radius:8px;padding:10px 8px;text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,0.03);}
+  .stat{background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-radius:8px;padding:10px 8px;text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,0.03);position:relative;overflow:hidden;}
+  .stat.level-up{animation:levelPulse 1.1s ease both;border-color:var(--gold);}
+  .stat.level-up::after{content:"";position:absolute;inset:-30%;background:radial-gradient(circle, rgba(217,164,65,0.42), transparent 58%);animation:runeFlash 1s ease both;}
   .stat .num{font-family:'VT323',monospace;font-size:34px;line-height:0.9;color:var(--gold);}
   .stat.flame .num{color:var(--ember);}
   .stat .lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);margin-top:4px;}
@@ -42,8 +50,9 @@
   .xpwrap{margin:4px 0 20px;}
   .xprow{display:flex;justify-content:space-between;align-items:baseline;font-family:'VT323',monospace;font-size:16px;color:var(--ink-dim);margin-bottom:4px;}
   .xprow .lvl{color:var(--gold);letter-spacing:2px;}
-  .xpbar{height:12px;background:var(--panel);border:1px solid var(--line);border-radius:20px;overflow:hidden;}
-  .xpfill{height:100%;width:0%;background:linear-gradient(90deg,var(--ember),var(--gold));box-shadow:0 0 12px var(--glow);transition:width 0.6s cubic-bezier(.2,.8,.2,1);}
+  .xpbar{height:12px;background:var(--panel);border:1px solid var(--line);border-radius:20px;overflow:hidden;position:relative;}
+  .xpfill{height:100%;width:0%;background:linear-gradient(90deg,var(--ember),var(--gold));box-shadow:0 0 12px var(--glow);transition:width 0.72s cubic-bezier(.2,.8,.2,1);}
+  .xpfill::after{content:"";display:block;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.42),transparent);animation:barShimmer 1.5s ease infinite;opacity:.65;}
 
   .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-bottom:16px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.35);}
   .phead{display:flex;align-items:center;gap:10px;padding:13px 16px;cursor:pointer;user-select:none;background:linear-gradient(180deg,var(--panel-2),transparent);border-bottom:1px solid transparent;}
@@ -57,8 +66,10 @@
   .panel.open .pbody{display:block;}
   .pintro{color:var(--ink-dim);font-size:14px;font-style:italic;margin:8px 2px 14px;line-height:1.5;}
 
-  .quest{display:flex;gap:12px;align-items:flex-start;padding:11px 12px;border:1px solid transparent;border-radius:8px;cursor:pointer;transition:background .15s,border-color .15s;}
+  .quest{display:flex;gap:12px;align-items:flex-start;padding:11px 12px;border:1px solid transparent;border-radius:8px;cursor:pointer;transition:background .15s,border-color .15s,opacity .15s,transform .15s;}
   .quest:hover{background:var(--panel-2);border-color:var(--line);}
+  .quest:active{transform:translateY(1px);}
+  .quest.busy,.quest[aria-disabled="true"]{opacity:.58;cursor:wait;}
   .quest+.quest{margin-top:2px;}
   .box{flex:0 0 22px;height:22px;margin-top:1px;border:1.5px solid var(--ink-faint);border-radius:5px;display:grid;place-items:center;transition:all .18s;font-family:'VT323',monospace;color:transparent;font-size:18px;}
   .quest.done .box{background:var(--green);border-color:var(--green);color:#14110d;}
@@ -70,7 +81,7 @@
   .quest .xp{flex:0 0 auto;font-family:'VT323',monospace;font-size:15px;color:var(--ink-faint);margin-top:2px;}
   .quest.done .xp{color:var(--green);}
 
-  .claim{width:100%;margin-top:14px;padding:14px;font-family:'Cinzel',serif;font-weight:700;font-size:16px;letter-spacing:2px;text-transform:uppercase;color:#14110d;border:none;border-radius:8px;background:linear-gradient(180deg,var(--gold),var(--ember));cursor:pointer;box-shadow:0 6px 20px var(--glow);transition:transform .1s,filter .2s;}
+  .claim{width:100%;margin-top:14px;padding:14px;font-family:'Cinzel',serif;font-weight:700;font-size:16px;letter-spacing:2px;text-transform:uppercase;color:#14110d;border:none;border-radius:8px;background:linear-gradient(180deg,var(--gold),var(--ember));cursor:pointer;box-shadow:0 6px 20px var(--glow);transition:transform .1s,filter .2s,opacity .15s;}
   .claim:hover:not(:disabled){filter:brightness(1.08);}
   .claim:active:not(:disabled){transform:translateY(2px);}
   .claim:disabled{background:var(--panel-2);color:var(--ink-faint);box-shadow:none;cursor:not-allowed;border:1px solid var(--line);}
@@ -79,9 +90,10 @@
   textarea.json{width:100%;min-height:120px;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--ink);font-family:'VT323',monospace;font-size:15px;line-height:1.4;resize:vertical;}
   textarea.json:focus{outline:none;border-color:var(--gold);}
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px;}
-  .btn{font-family:'Cinzel',serif;font-weight:600;font-size:13px;letter-spacing:1px;padding:9px 16px;border-radius:7px;cursor:pointer;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);}
+  .btn{font-family:'Cinzel',serif;font-weight:600;font-size:13px;letter-spacing:1px;padding:9px 16px;border-radius:7px;cursor:pointer;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);transition:filter .18s,opacity .18s;}
   .btn.primary{background:linear-gradient(180deg,var(--gold),var(--ember));color:#14110d;border:none;}
-  .btn:hover{filter:brightness(1.08);}
+  .btn:hover:not(:disabled){filter:brightness(1.08);}
+  .btn:disabled, textarea:disabled{opacity:.55;cursor:wait;}
   .filelbl{font-size:13px;color:var(--ink-dim);}
   .hint{font-size:12.5px;color:var(--ink-faint);font-style:italic;}
 
@@ -89,7 +101,9 @@
   .logline:last-child{border-bottom:none;}
   .logline .ld{font-family:'VT323',monospace;color:var(--ember);flex:0 0 auto;font-size:15px;}
   .logline .lt{color:var(--ink-dim);}
-  .logempty{color:var(--ink-faint);font-style:italic;font-size:13px;padding:6px 4px;}
+  .logempty,.empty-copy{color:var(--ink-faint);font-style:italic;font-size:13.5px;padding:6px 4px;line-height:1.55;}
+  .empty-board{border:1px dashed var(--line);border-radius:8px;background:rgba(20,17,13,.45);padding:14px;margin-top:8px;}
+  .empty-title{font-family:'Cinzel',serif;color:var(--gold);font-size:16px;letter-spacing:.5px;margin-bottom:5px;}
 
   .foot{text-align:center;margin-top:24px;}
   .reset{background:none;border:1px solid var(--line);color:var(--ink-faint);font-family:'VT323',monospace;font-size:14px;letter-spacing:1px;padding:7px 16px;border-radius:6px;cursor:pointer;}
@@ -99,11 +113,50 @@
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
   #toast.err{border-color:var(--red);color:var(--red);}
   .loading{text-align:center;padding:80px 0;color:var(--ink-dim);font-family:'VT323',monospace;font-size:20px;letter-spacing:2px;}
+  .state-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.35);}
+  .state-card h2{font-family:'Cinzel',serif;color:var(--gold);margin:0 0 8px;font-size:19px;}
+  .state-card p{color:var(--ink-dim);line-height:1.5;margin:0 0 12px;}
+  .xp-pop{position:fixed;z-index:80;left:0;top:0;font-family:'VT323',monospace;font-size:27px;letter-spacing:1px;color:var(--gold);text-shadow:0 0 14px rgba(217,164,65,.85),0 2px 0 #14110d;pointer-events:none;animation:xpFloat .95s cubic-bezier(.2,.8,.2,1) forwards;}
+  .xp-pop.neg{color:var(--red);text-shadow:0 0 14px rgba(192,83,63,.55),0 2px 0 #14110d;}
+  #levelBurst{position:fixed;inset:0;z-index:75;display:grid;place-items:center;pointer-events:none;opacity:0;transform:scale(.92);transition:opacity .18s,transform .18s;}
+  #levelBurst.show{opacity:1;transform:scale(1);}
+  .burst-card{border:1px solid var(--gold);border-radius:10px;background:linear-gradient(180deg,rgba(36,30,23,.96),rgba(20,17,13,.94));box-shadow:0 0 60px rgba(217,164,65,.24),0 20px 60px rgba(0,0,0,.65);padding:20px 26px;text-align:center;animation:burstCard 1.35s ease both;}
+  .burst-card .over{font-family:'VT323',monospace;color:var(--ember);font-size:18px;letter-spacing:4px;text-transform:uppercase;}
+  .burst-card .big{font-family:'Cinzel',serif;color:var(--gold);font-size:34px;letter-spacing:3px;margin:2px 0;text-shadow:0 0 24px rgba(217,164,65,.42);}
+  .burst-card .small{font-family:'VT323',monospace;color:var(--ink-dim);font-size:20px;letter-spacing:1px;}
+
+  @keyframes xpFloat{0%{opacity:0;transform:translate(-50%,4px) scale(.86);}15%{opacity:1;}100%{opacity:0;transform:translate(-50%,-48px) scale(1.14);}}
+  @keyframes levelPulse{0%,100%{box-shadow:inset 0 1px 0 rgba(255,255,255,0.03);}35%{box-shadow:0 0 0 2px rgba(217,164,65,.32),0 0 30px rgba(217,164,65,.28),inset 0 1px 0 rgba(255,255,255,0.08);transform:translateY(-1px);}}
+  @keyframes runeFlash{0%{opacity:0;transform:scale(.7) rotate(0deg);}38%{opacity:1;}100%{opacity:0;transform:scale(1.35) rotate(18deg);}}
+  @keyframes barShimmer{0%{transform:translateX(-100%);}100%{transform:translateX(180%);}}
+  @keyframes burstCard{0%{transform:scale(.82);opacity:0;}18%{transform:scale(1.04);opacity:1;}82%{transform:scale(1);opacity:1;}100%{transform:scale(.96);opacity:0;}}
+
+  @media (max-width:420px){
+    body{padding:16px 10px 44px;}
+    .stats{gap:6px;margin-top:14px;}
+    .stat{padding:9px 4px;}
+    .stat .num{font-size:28px;}
+    .stat .lbl{font-size:9px;letter-spacing:1.2px;}
+    .phead{padding:12px 12px;gap:7px;}
+    .phead .tag{font-size:13px;letter-spacing:1.2px;}
+    .phead h2{font-size:16px;}
+    .pbody{padding:6px 11px 13px;}
+    .quest{padding:10px 8px;gap:9px;}
+    .qtext .qt{font-size:14px;}
+    .qtext .qd{font-size:12px;}
+    .claim{font-size:14px;letter-spacing:1.4px;padding:13px 10px;}
+    .btn{width:100%;text-align:center;}
+    .row{gap:8px;}
+    #toast{width:calc(100vw - 24px);bottom:18px;text-align:center;padding:11px 14px;font-size:13px;}
+    .burst-card{width:calc(100vw - 38px);padding:18px 12px;}
+    .burst-card .big{font-size:28px;}
+  }
 </style>
 </head>
 <body>
 <div class="wrap" id="root"><div class="loading">SUMMONING QUEST LOG…</div></div>
 <div id="toast"></div>
+<div id="levelBurst" aria-hidden="true"></div>
 
 <script>
 const api = (p, opts) => fetch(p, opts).then(async r => {
@@ -112,15 +165,38 @@ const api = (p, opts) => fetch(p, opts).then(async r => {
   return j;
 });
 let S = null;            // last state
+let lastProfile = null;
+let busy = false;
 const open = { import:true, daily:true, weekly:true, log:false };
 
 function toast(msg, isErr){
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.toggle('err',!!isErr); t.classList.add('show');
-  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),1900);
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2400);
 }
 
-async function refresh(){ S = await api('/api/state'); render(); }
+function setBusy(on){
+  busy=on;
+  document.body.classList.toggle('busy',on);
+  document.querySelectorAll('button, textarea, input').forEach(el=>{
+    if(on){
+      el.dataset.wasDisabled=el.disabled?'true':'false';
+      el.disabled=true;
+    }else{
+      el.disabled=el.dataset.wasDisabled==='true';
+      delete el.dataset.wasDisabled;
+    }
+  });
+  document.querySelectorAll('.quest').forEach(el=>{
+    el.classList.toggle('busy',on);
+    el.setAttribute('aria-disabled',on?'true':'false');
+  });
+}
+
+async function refresh(){
+  try{ S = await api('/api/state'); render(); }
+  catch(e){ renderOffline(e); toast('Could not reach the quest server',true); }
+}
 
 function questRow(q){
   return `<div class="quest ${q.done?'done':''}" data-q="${q.id}">
@@ -141,6 +217,9 @@ function panel(key,tag,title,meta,intro,body){
 
 function render(){
   const p=S.profile, f=S.flags;
+  const prev=lastProfile;
+  const leveled=!!prev && p.level>prev.level;
+  const startXp=prev ? prev.xpInLevel : p.xpInLevel;
   document.getElementById('root').innerHTML = `
     <div class="crest">
       <div class="eyebrow">▸ Routine Quest ◂</div>
@@ -148,21 +227,26 @@ function render(){
       <div class="sub">Upload a quest set. Check things off. Watch the bar fill.</div>
     </div>
     <div class="stats">
-      <div class="stat"><div class="num">${p.level}</div><div class="lbl">Level</div></div>
+      <div class="stat ${leveled?'level-up':''}" id="levelStat"><div class="num">${p.level}</div><div class="lbl">Level</div></div>
       <div class="stat flame"><div class="num">${p.streak}🔥</div><div class="lbl">Streak</div></div>
       <div class="stat"><div class="num">${p.totalDays}</div><div class="lbl">Days</div></div>
       <div class="stat"><div class="num">${p.bestStreak}</div><div class="lbl">Best</div></div>
     </div>
     <div class="xpwrap">
       <div class="xprow"><span class="lvl">LVL ${p.level}</span><span>${p.xpInLevel} / 100 XP</span></div>
-      <div class="xpbar"><div class="xpfill" style="width:${p.xpInLevel}%"></div></div>
+      <div class="xpbar"><div class="xpfill" data-target="${p.xpInLevel}" data-start="${startXp}" style="width:${startXp}%"></div></div>
     </div>
     ${importPanel()}
+    ${(!f.hasDaily && !f.hasWeekly) ? emptyQuestPanel() : ''}
     ${f.hasDaily ? dailyPanel() : ''}
     ${f.hasWeekly ? weeklyPanel() : ''}
     ${logPanel()}
     <div class="foot"><button class="reset" id="resetBtn">↺ Reset everything</button></div>`;
   bind();
+  animateXpBar(prev,p);
+  if(leveled) levelBurst(p.level);
+  lastProfile={...p};
+  if(busy) setBusy(true);
 }
 
 function importPanel(){
@@ -175,6 +259,15 @@ function importPanel(){
     </div>
     <div class="hint" style="margin-top:8px;">Importing replaces the current quest set. Your XP, streak and log are kept.</div>`;
   return panel('import','◈ Scroll','Quest Set','', 'Paste or upload a JSON with <b>daily</b> and/or <b>weekly</b> arrays. Each quest needs a <b>title</b>; description and xp are optional.', body);
+}
+
+function emptyQuestPanel(){
+  const body=`<div class="empty-board">
+    <div class="empty-title">No quests on the board yet.</div>
+    <div class="empty-copy">Import a quest set above to start earning XP. Paste JSON into the scroll, or choose <b>sample-quests.json</b> from this project.</div>
+    <div class="row"><button class="btn primary" id="focusImport">Prepare the Scroll</button></div>
+  </div>`;
+  return panel('empty','◈ Board','No Quests','0','',body);
 }
 
 function dailyPanel(){
@@ -195,51 +288,143 @@ function weeklyPanel(){
 
 function logPanel(){
   const items=S.log.map(l=>`<div class="logline"><span class="ld">${esc(l.date.slice(5))}</span><span class="lt">${esc(l.text)}</span></div>`).join('');
-  return panel('log','◈ Chronicle','The Log','', '', items||`<div class="logempty">Nothing recorded yet.</div>`);
+  return panel('log','◈ Chronicle','The Log','', '', items||`<div class="logempty">The chronicle is quiet. Import quests, check one off, or claim a day to etch the first entry.</div>`);
+}
+
+function renderOffline(e){
+  document.getElementById('root').innerHTML=`
+    <div class="crest">
+      <div class="eyebrow">▸ Routine Quest ◂</div>
+      <h1>Quest Log Offline</h1>
+      <div class="sub">The board is intact, but the server did not answer.</div>
+    </div>
+    <div class="state-card">
+      <h2>No signal from the campfire.</h2>
+      <p>Start the server, then retry. If the database is sleeping, give it a beat and try again.</p>
+      <p class="hint">${esc(e.message||'Could not reach /api/state')}</p>
+      <button class="btn primary" id="retryBtn">Try Again</button>
+    </div>`;
+  const rb=document.getElementById('retryBtn');
+  if(rb) rb.addEventListener('click',refresh);
 }
 
 function bind(){
   document.querySelectorAll('[data-head]').forEach(h=>h.addEventListener('click',()=>{open[h.dataset.head]=!open[h.dataset.head];render();}));
-  document.querySelectorAll('.quest').forEach(q=>q.addEventListener('click',()=>toggle(q.dataset.q)));
+  document.querySelectorAll('.quest').forEach(q=>q.addEventListener('click',()=>toggle(q.dataset.q,q)));
   const ib=document.getElementById('importBtn'); if(ib) ib.addEventListener('click',doImport);
   const fi=document.getElementById('fileIn'); if(fi) fi.addEventListener('change',readFile);
-  const cd=document.getElementById('claimDay'); if(cd) cd.addEventListener('click',()=>act('/api/claim-day','⚔ Day claimed'));
-  const cw=document.getElementById('claimWeek'); if(cw) cw.addEventListener('click',()=>act('/api/claim-week','★ Week sealed'));
+  const cd=document.getElementById('claimDay'); if(cd) cd.addEventListener('click',()=>act('/api/claim-day','⚔ Day claimed',cd));
+  const cw=document.getElementById('claimWeek'); if(cw) cw.addEventListener('click',()=>act('/api/claim-week','★ Week sealed',cw));
   const rb=document.getElementById('resetBtn'); if(rb) rb.addEventListener('click',doReset);
+  const focus=document.getElementById('focusImport'); if(focus) focus.addEventListener('click',()=>{open.import=true;render();document.getElementById('jsonBox')?.focus();});
 }
 
-async function toggle(id){
-  try{ S=await api(`/api/quest/${id}/toggle`,{method:'POST'}); render(); }
-  catch(e){ toast(e.message,true); }
+function animateXpBar(prev,p){
+  const fill=document.querySelector('.xpfill');
+  if(!fill) return;
+  const target=Number(fill.dataset.target||p.xpInLevel);
+  const start=prev ? prev.xpInLevel : target;
+  fill.style.width=`${start}%`;
+  requestAnimationFrame(()=>{
+    if(prev && p.level>prev.level){
+      fill.style.width='100%';
+      setTimeout(()=>{
+        fill.style.transition='none';
+        fill.style.width='0%';
+        requestAnimationFrame(()=>{
+          fill.style.transition='';
+          fill.style.width=`${target}%`;
+        });
+      },720);
+    }else{
+      fill.style.width=`${target}%`;
+    }
+  });
 }
-async function act(url,msg){
-  try{ S=await api(url,{method:'POST'}); toast(msg); render(); }
+
+function popXp(amount,anchor){
+  if(!amount) return;
+  const el=document.createElement('div');
+  el.className=`xp-pop ${amount<0?'neg':''}`;
+  el.textContent=`${amount>0?'+':''}${amount} XP`;
+  const rect=anchor || document.querySelector('.xpbar')?.getBoundingClientRect() || {left:window.innerWidth/2,top:90,width:0,height:0};
+  el.style.left=`${rect.left + rect.width/2}px`;
+  el.style.top=`${rect.top + Math.min(rect.height/2,24)}px`;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1000);
+}
+
+function levelBurst(level){
+  const burst=document.getElementById('levelBurst');
+  burst.innerHTML=`<div class="burst-card"><div class="over">Ascension</div><div class="big">LEVEL UP</div><div class="small">Level ${level}</div></div>`;
+  burst.classList.add('show');
+  toast(`LEVEL ${level} REACHED`);
+  clearTimeout(burst._t);
+  burst._t=setTimeout(()=>burst.classList.remove('show'),1350);
+}
+
+async function toggle(id,el){
+  if(busy) return;
+  const before=S.profile.xp;
+  const rect=el?.getBoundingClientRect();
+  try{
+    setBusy(true);
+    S=await api(`/api/quest/${id}/toggle`,{method:'POST'});
+    const diff=S.profile.xp-before;
+    render();
+    popXp(diff,rect);
+  }
   catch(e){ toast(e.message,true); }
+  finally{ setBusy(false); }
+}
+async function act(url,msg,el){
+  if(busy) return;
+  const before=S.profile.xp;
+  const rect=el?.getBoundingClientRect();
+  try{
+    setBusy(true);
+    S=await api(url,{method:'POST'});
+    const diff=S.profile.xp-before;
+    render();
+    if(diff) popXp(diff,rect);
+    toast(msg);
+  }
+  catch(e){ toast(e.message,true); }
+  finally{ setBusy(false); }
 }
 function readFile(e){
   const file=e.target.files[0]; if(!file) return;
   document.getElementById('fileName').textContent=file.name;
   const r=new FileReader();
   r.onload=()=>{ const box=document.getElementById('jsonBox'); if(box) box.value=r.result; };
+  r.onerror=()=>toast('Could not read that quest file',true);
   r.readAsText(file);
 }
 async function doImport(){
+  if(busy) return;
   const box=document.getElementById('jsonBox');
   let parsed;
   try{ parsed=JSON.parse(box.value); }
-  catch{ return toast('That is not valid JSON',true); }
-  try{ S=await api('/api/import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(parsed)}); toast('Quests imported'); open.import=false; render(); }
+  catch{ return toast('That scroll is not valid JSON',true); }
+  try{
+    setBusy(true);
+    S=await api('/api/import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(parsed)});
+    toast('Quests imported');
+    open.import=false;
+    render();
+  }
   catch(e){ toast(e.message,true); }
+  finally{ setBusy(false); }
 }
 async function doReset(){
+  if(busy) return;
   if(!confirm('Wipe quests, XP, streak and log?')) return;
-  try{ S=await api('/api/reset',{method:'POST'}); toast('Reset'); render(); }
+  try{ setBusy(true); S=await api('/api/reset',{method:'POST'}); toast('Reset'); render(); }
   catch(e){ toast(e.message,true); }
+  finally{ setBusy(false); }
 }
 
-refresh().catch(e=>{
-  document.getElementById('root').innerHTML=`<div class="loading">Could not reach the server.<br><span style="font-size:14px">${esc(e.message)}</span></div>`;
-});
+refresh();
 </script>
 </body>
 </html>

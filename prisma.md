@@ -29,6 +29,11 @@ This project was moved onto Prisma Postgres using the current Prisma ORM v7 setu
 - Added `scripts/verify-prisma.ts` to run one read and print `✅ Connected`.
 - Updated the app server from the old `@prisma/client` import path to the generated Prisma v7 client through `lib/prisma.ts`.
 - Added package scripts for generate, migrate, seed, studio, and verification.
+- Added Vercel deployment wiring:
+  - `src/app.ts` exports the Express app for Vercel
+  - `vercel.json` runs `npm run vercel-build`
+  - `npm run vercel-build` runs `prisma migrate deploy` and `prisma generate`
+  - `/healthz` checks that the app can reach the database
 
 ## Why It Mattered
 
@@ -40,14 +45,18 @@ Putting `DATABASE_URL` in `.env` and keeping `.env` ignored prevents database cr
 
 The migration gives the database a reproducible schema history. The seed script gives a fresh database usable starter data. The verify script gives a quick health check that confirms the generated client, adapter, environment loading, and database connection all work together.
 
+For Vercel, deploys should use `prisma migrate deploy`, not `prisma db push`. `migrate deploy` applies only committed migration files and is the production-safe path for a hosted database.
+
 ## Useful Commands
 
 ```bash
 npm run db:generate
 npm run db:migrate
+npm run db:deploy
 npm run db:seed
 npm run db:verify
 npm run db:studio
+npm run vercel-build
 ```
 
 Use Prisma only from server-side code or scripts. Do not import `lib/prisma.ts` or the generated Prisma Client into browser/client-side code.

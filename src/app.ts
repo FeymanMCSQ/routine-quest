@@ -86,6 +86,16 @@ app.get("/api/state", async (_req, res) => {
   }
 });
 
+app.get("/healthz", async (_req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ ok: true });
+  } catch (error) {
+    console.error(error);
+    res.status(503).json({ ok: false });
+  }
+});
+
 app.post("/api/import", async (req, res) => {
   try {
     const body = req.body || {};
@@ -260,4 +270,8 @@ app.post("/api/reset", async (_req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Routine Quest running on http://localhost:${PORT}`));
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => console.log(`Routine Quest running on http://localhost:${PORT}`));
+}
+
+export default app;
